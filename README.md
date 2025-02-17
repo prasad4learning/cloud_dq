@@ -1,133 +1,183 @@
+# Cloud Data Quest - Cloud Data Pipeline
 
-## Parts 1 & 2: Data Ingestion and Storage
+## Overview
 
-### Approach
+This repository contains the implementation of the **Cloud Data Quest**, a multi-step data engineering challenge that demonstrates skills in **AWS, Terraform, Python, Jupyter Notebooks, and Data Analytics**. The project consists of four parts:
 
-I created a Python script (`arc_bls_data_file_sync.py`) to automate the process of fetching data from the BLS website and the Data USA API, and uploading it to an AWS S3 bucket (`arc-cloud-dq`).
+1. **AWS S3 & Sourcing Datasets** - Fetching data from the **Bureau of Labor Statistics (BLS)** and storing it in S3.
+2. **APIs & Data Ingestion** - Extracting data from **DataUSA API** and storing it in S3.
+3. **Data Analysis & Reporting** - Processing and analyzing data using **Pandas & Jupyter Notebooks**.
+4. **Infrastructure as Code (IAC) & Automation** - Automating the pipeline with **Terraform, AWS Lambda, S3 Events, and SQS**.
 
-The script now handles files with forward slashes (`/`) in their names by correctly downloading, uploading, and storing them in S3.
+---
 
-I used a robust data synchronization technique that has retry mechanisms and also used log levels and also other items to download
-
-### Libraries Used
-
-*   `requests`: For making HTTP requests to fetch data from the BLS website and the Data USA API.
-*   `boto3`: For interacting with AWS S3, including uploading files, listing bucket contents, and deleting files.
-*   `beautifulsoup4`: For parsing HTML content from the BLS website to extract file names.
-*   `re`: For using regular expressions to extract file names from the HTML content.
-*   `logging`: For logging events and errors during the data synchronization process.
-*   `argparse`: For defining command-line arguments to configure the script.
-*   `tenacity`: For adding retry logic to handle potential network errors or temporary unavailability of the BLS website.
-
-### Key Modules and Functions
-
-*   `list_s3_files(s3_client, s3_bucket)`: Lists all files currently stored in the S3 bucket.
-*   `download_file(file_url, local_path, headers)`: Downloads a file from the given URL with retry logic.
-*   `upload_to_s3(s3_client, file_path, s3_bucket, file_name)`: Uploads a file to S3 with retry logic.
-*   `fetch_data_from_api(api_url, headers=None)`: Fetches data from an API endpoint.
-*   `save_json_to_s3(s3_client, data, s3_bucket, file_name)`: Saves JSON data to an S3 bucket.
-*   `main()`: The main function that orchestrates the entire data synchronization process.
-
-### Running the Script
-
-1.  **Install Dependencies:**
-
-    ```
-    pip install requests beautifulsoup4 boto3 argparse tenacity
-    ```
-
-2.  **Configure AWS Credentials:**
-
-    *   Ensure your AWS credentials are configured correctly.  Use `aws configure`.
-
-3.  **Execute the Script:**
-
-    ```
-    python arc_bls_data_file_sync.py
-    ```
-
-## Part 3: Data Analysis and Report Generation
-
-I have created a fully operational Part 1, Part 2 and Part 3.
-
-### Approach
-
-This part makes use of the files
-The files that are used are
-
-`arc_bls_data_analysis.ipynb`:
-
-`cloud_bls_data_analysis.ipynb`:
-
-
-I used a Jupyter Notebook (`cloud_bls_data_analysis.ipynb`) with pandas to perform data analysis and generate reports based on the data stored in S3.
-
-### Libraries Used
-
-*   `pandas`: For data manipulation and analysis.
-*   `boto3`: For reading data from S3.
-*   `json`: For handling JSON data.
-*   `io`: For working with in-memory data streams.
-
-### Analysis Steps
-
-1.  **Load Data:** Load the CSV file from Part 1 (`pr.data.0.Current`) and the JSON file from Part 2 (`datausa_population.json`) into Pandas DataFrames.
-2.  **Population Data Analysis:**
-    *   Filter the population DataFrame to include only the years 2013 to 2018 (inclusive).
-    *   Calculate the mean and standard deviation of the "Population" column for the filtered data.
-3.  **Time-Series Data Analysis:**
-    *   For every `series_id`, find the best year (the year with the largest sum of "value" for all quarters in that year).
-    *   Generate a report with each `series_id`, the best year for that series, and the summed value for that year.
-4.  **Combined Data Analysis:**
-    *   Generate a report that provides the value for `series_id = PRS30006032` and `period = Q01` and the population for that given year (if available in the population dataset).
-
-### Challenges Faced
-
-*   **Data Cleaning:** Public datasets often require data cleaning. I used `str.strip()` to remove leading/trailing whitespace and `astype()` to convert columns to the correct data types.
-*   **PRS30006032 Data:** I was unable to find data for `series_id = PRS30006032` in the BLS dataset. As a result, the combined data analysis report may be incomplete.
-*   These were a lot of things for S3 and all the credentials.
-
-#### `arc_bls_data_analysis.ipynb`
-
-*   **Significance:** This notebook contains the core data analysis and report generation logic for Part 3. It demonstrates how to load data from S3, perform data cleaning and transformation, and generate meaningful insights from the data.
-
-#### `cloud_bls_data_analysis.ipynb`
-
-*   **Significance:** This notebook acts as a testing code
-All your questions are valid, and I can address those later. Good luck. Follow all steps and let me know and I am on standby
-
-## Part 4: Infrastructure as Code (Terraform)
-
-I have implemented the Terraform to complete your code and functions
+## Part 1: AWS S3 & Sourcing Datasets
 
 ### Goal
 
-*   I now have a complete S3
+- Download **BLS time-series data** from `https://download.bls.gov/pub/time.series/pr/`
+- Upload new files to **AWS S3 (`arc-cloud-dq`)**
+- Keep S3 in sync (handle new, deleted, and modified files)
 
-The Terraform configuration is organized into modules for better maintainability and reusability and also the key IAM.
+### Implementation
 
-*   **S3**: There is now an S3 where you are able to put the files for your data.
-*   **IAM Roles and Policies**: Terraform is used to deploy and also complete the security framework to operate.
-*   **CloudWatch Events Rule**: I am creating the rules for the events.
-*   **Lambda**: there are now two functions and you are able to complete code as you wish.
+- **Script:** [`arc_bls_data_file_sync.py`](https://github.com/prasad4learning/cloud_dq/blob/main/arc_bls_data_file_sync.py)
+- **Steps:**
+  1. Extract filenames from the BLS website.
+  2. Download new files to `bls_data/`.
+  3. Upload the files to **AWS S3**.
+  4. Keep the S3 bucket in sync by deleting outdated files.
+  5. Log errors and ensure retries for failed downloads/uploads.
 
-Here are the core files, there are
+### Challenges Faced
 
-*   **`main.tf`**: Contains S3, IAM Role, and the Lambda function and schedule
-*   **`variables.tf`**: Defines the input variables for the Terraform configuration.
-*   **`outputs.tf`**: Defines the output values that will be displayed after the Terraform configuration is applied.
+- **Parsing HTML for file extraction:** Required using BeautifulSoup to extract filenames correctly.
+- **Handling API access issues:** Implemented proper `User-Agent` headers to avoid being blocked.
+- **Ensuring idempotency:** The script avoids redundant uploads by checking for existing files in S3.
 
-### Challenges
+### Running the Script
 
-*   Configuring the Terraform provider and authenticating with AWS.
-*   Defining the resources and configuring the IAM roles, function, and triggers.
-*   Automating and linking the functions
+```bash
+python arc_bls_data_file_sync.py
+```
 
+---
 
-## Next Steps
+## Part 2: APIs & Data Ingestion
 
-*   Complete the Terraform configuration for Part 4.
-*   Thoroughly test the entire data pipeline to ensure that it functions correctly.
-*   Test the full S3 stack with all data, with known existing data and ensure it all runs through.
-*   Add any relevant items
+### Goal
+
+- Fetch **US population data** from the **DataUSA API** (`https://datausa.io/api/data?drilldowns=Nation&measures=Population`).
+- Store the JSON response in **AWS S3**.
+
+### Implementation
+
+- **Script:** `arc_bls_data_file_sync.py` (combined with Part 1)
+- **Steps:**
+  1. Call the DataUSA API and fetch population data.
+  2. Save the response as `datausa_population.json`.
+  3. Upload the JSON file to **S3** (without duplicating existing files).
+
+### Challenges Faced
+
+- **Handling API rate limits:** Implemented retries with exponential backoff using `tenacity`.
+- **Ensuring S3 consistency:** Preventing redundant uploads using S3 object checks.
+
+### Running the Script
+
+```bash
+python arc_bls_data_file_sync.py
+```
+
+---
+
+## Part 3: Data Analysis & Reporting
+
+### Goal
+
+- Analyze the **BLS time-series data** (`pr.data.0.Current` from Part 1) and **US population data** (`datausa_population.json` from Part 2).
+- Generate reports on trends and insights.
+
+### Implementation
+
+- **Notebooks:**
+  - [`cloud_bls_data_analysis.ipynb`](https://github.com/prasad4learning/cloud_dq/blob/main/cloud_bls_data_analysis.ipynb)
+  - [`arc_bls_data_analysis.ipynb`](https://github.com/prasad4learning/cloud_dq/blob/main/arc_bls_data_analysis.ipynb)
+
+### Significance of the Notebooks
+
+#### `arc_bls_data_analysis.ipynb`
+- Focuses on analyzing **BLS time-series data** to find trends in employment-related data.
+- Includes steps for **data cleaning, transformation, and aggregations**.
+- Identifies **best years per series_id** by summing quarterly values.
+
+#### `cloud_bls_data_analysis.ipynb`
+- Integrates **US population data** with **BLS time-series data**.
+- Computes **mean & standard deviation of US population (2013-2018)**.
+- Matches `series_id=PRS30006032` (if available) with population data, but **data was not found for this series_id**.
+
+### Challenges Faced
+
+- **Missing Data:** Some expected series_id values were not found.
+- **Data Cleaning:** Required trimming spaces and handling missing values.
+- **Performance:** Optimized large datasets using Pandas efficient operations.
+
+### Running the Analysis
+
+Open the notebooks in Jupyter:
+
+```bash
+jupyter lab
+```
+
+Run the cells in **`cloud_bls_data_analysis.ipynb`** and **`arc_bls_data_analysis.ipynb`** to generate the reports.
+
+---
+
+## Part 4: Infrastructure as Code & Automation
+
+### Goal
+
+- Automate the data pipeline using **Terraform & AWS Lambda**.
+- Set up **S3 Event Notifications & SQS** to trigger Lambda processing.
+
+### Implementation
+
+- **Terraform Modules Used:**
+  - **IAM Module:** Defines roles, policies, and permissions for Lambda execution.
+  - **S3 Module:** Creates and manages the S3 bucket for storing data.
+  - **Lambda Module:** Deploys a processing Lambda function.
+  - **SQS Module:** Sets up an SQS queue for event-driven processing.
+
+- **Lambda Functions Implemented:**
+  - **Processing Lambda:** Handles S3 events and processes incoming data.
+  - **Scheduled Lambda:** Runs Part 1 & Part 2 as a daily job.
+
+- **IAM Roles & Policies:**
+  - Created a **Lambda Execution Role** with `s3:GetObject`, `s3:PutObject`, `sqs:SendMessage`, and `logs:CreateLogStream` permissions.
+  - Attached the necessary **IAM policies** to allow Lambda execution.
+
+### Challenges Faced
+
+- **IAM Permissions:** Required fine-tuning few policies to allow Lambda & S3 interactions.
+- **Terraform Configuration Issues:** Encountered region mismatches (`eu-east-1` instead of `us-north-1`).
+- **S3 Bucket Ownership Conflicts:** Fixed by verifying the bucket before attempting creation.
+
+### Running Terraform Deployment
+
+```bash
+
+terraform init
+terraform plan
+terraform apply
+```
+
+---
+
+## Key Takeaways
+
+### What I Explored & Learned
+
+- **Data Ingestion:** Handling public datasets via web scraping & API calls.
+- **Cloud Storage:** Automating data synchronization with AWS S3.
+- **Data Analytics:** Cleaning & processing large datasets using Pandas.
+- **Infrastructure as Code:** Deploying cloud infrastructure with Terraform.
+- **Event-Driven Architectures:** Using **S3 Event Notifications & SQS** to trigger processing.
+- **AWS Lambda Functions:** Automating serverless data pipelines.
+- **IAM & Security:** Managing policies & permissions for AWS resources.
+
+---
+
+## Author
+
+**Prasad RK** | [GitHub](https://github.com/prasad4learning)
+
+---
+
+## References
+
+- Cloud Data Quest Official Challenge
+- [Bureau of Labor Statistics (BLS)](https://www.bls.gov/)
+- [DataUSA API](https://datausa.io/about/api/)
+
 
