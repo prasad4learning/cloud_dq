@@ -1,4 +1,33 @@
+#  Data Quest - Cloud Data Pipeline
 
+## Overview
+
+This repository contains the implementation of the **Rearc Data Quest**, a multi-step data engineering challenge that demonstrates skills in **AWS, Terraform, Python, and Data Analytics**. The project consists of four parts:
+
+1. **AWS S3 & Sourcing Datasets** - Fetching data from the **Bureau of Labor Statistics (BLS)** and storing it in S3.
+2. **APIs & Data Ingestion** - Extracting data from **DataUSA API** and storing it in S3.
+3. **Data Analysis & Reporting** - Processing and analyzing data using **Pandas & Jupyter Notebooks**.
+4. **Infrastructure as Code (IAC) & Automation** - Automating the pipeline with **Terraform & AWS Lambda** (In progress).
+
+---
+
+## Part 1: AWS S3 & Sourcing Datasets
+
+### Goal
+
+- Download **BLS time-series data** from `https://download.bls.gov/pub/time.series/pr/`
+- Upload new files to **AWS S3 (****`arc-cloud-dq`****)**
+- Keep S3 in sync (handle new, deleted, and modified files)
+
+### Implementation
+
+- **Script:** [`arc_bls_data_file_sync.py`](https://github.com/prasad4learning/cloud_dq/blob/main/arc_bls_data_file_sync.py)
+- **Steps:**
+  1. Extract filenames from the BLS website.
+  2. Download new files to `bls_data/`.
+  3. Upload the files to **AWS S3**.
+  4. Keep the S3 bucket in sync by deleting outdated files.
+  5. Log errors and ensure retries for failed downloads/uploads.
 ## Parts 1 & 2: Data Ingestion and Storage
 
 ### Approach
@@ -40,7 +69,7 @@ I created a Python script (`arc_bls_data_file_sync.py`) to automate the process 
 3.  **Execute the Script:**
 
     ```
-    python arc_bls_data_file_sync.py --s3_bucket arc-cloud-dq --email your_email@example.com
+    python arc_bls_data_file_sync.py
     ```
 
 ## Part 3: Data Analysis and Report Generation
