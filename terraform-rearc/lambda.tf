@@ -1,19 +1,20 @@
 resource "aws_lambda_function" "processing_lambda" {
-  function_name    = "rearc_data_processing_lambda"
-  role            = aws_iam_role.lambda_execution_role.arn
-  runtime        = "python3.8"
-  handler        = "lambda_function.lambda_handler"
-  filename       = "lambda_package.zip"
+  function_name = "processing_lambda"
+  
+  role          = aws_iam_role.lambda_execution_role.arn  # IAM Role reference
 
-  source_code_hash = filebase64sha256("lambda_package.zip")
-
+  # Lambda function execution environment
   environment {
     variables = {
-      S3_BUCKET = data.aws_s3_bucket.existing_bucket.id
-      SQS_QUEUE_URL = aws_sqs_queue.data_queue.id
+      SQS_QUEUE_URL = aws_sqs_queue.existing_queue.url
     }
   }
 
-  depends_on = [aws_iam_role_policy_attachment.lambda_policy_attachment]
+  # Lambda function details like handler, runtime, etc.
+  handler = "lambda_function.lambda_handler"
+  runtime = "python3.8"
+
+  filename = "lambda_package.zip"  # Ensure you upload your Lambda function package
 }
+
 
