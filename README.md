@@ -43,7 +43,7 @@ I used a robust data synchronization technique that has retry mechanisms and als
 3.  **Execute the Script:**
 
     ```
-    python arc_bls_data_file_sync.py --s3_bucket arc-cloud-dq --email your_email@example.com
+    python arc_bls_data_file_sync.py
     ```
 
 ## Part 3: Data Analysis and Report Generation
