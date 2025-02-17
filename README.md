@@ -1,39 +1,13 @@
-#  Data Quest - Cloud Data Pipeline
 
-## Overview
-
-This repository contains the implementation of the **Cloud Data Quest**, a multi-step data engineering challenge that demonstrates skills in **AWS, Terraform, Python, and Data Analytics**. The project consists of four parts:
-
-1. **AWS S3 & Sourcing Datasets** - Fetching data from the **Bureau of Labor Statistics (BLS)** and storing it in S3.
-2. **APIs & Data Ingestion** - Extracting data from **DataUSA API** and storing it in S3.
-3. **Data Analysis & Reporting** - Processing and analyzing data using **Pandas & Jupyter Notebooks**.
-4. **Infrastructure as Code (IAC) & Automation** - Automating the pipeline with **Terraform & AWS Lambda** (In progress).
-
----
-
-## Part 1: AWS S3 & Sourcing Datasets
-
-### Goal
-
-- Download **BLS time-series data** from `https://download.bls.gov/pub/time.series/pr/`
-- Upload new files to **AWS S3 (****`arc-cloud-dq`****)**
-- Keep S3 in sync (handle new, deleted, and modified files)
-
-### Implementation
-
-- **Script:** [`arc_bls_data_file_sync.py`](https://github.com/prasad4learning/cloud_dq/blob/main/arc_bls_data_file_sync.py)
-- **Steps:**
-  1. Extract filenames from the BLS website.
-  2. Download new files to `bls_data/`.
-  3. Upload the files to **AWS S3**.
-  4. Keep the S3 bucket in sync by deleting outdated files.
-  5. Log errors and ensure retries for failed downloads/uploads.
 ## Parts 1 & 2: Data Ingestion and Storage
 
 ### Approach
 
 I created a Python script (`arc_bls_data_file_sync.py`) to automate the process of fetching data from the BLS website and the Data USA API, and uploading it to an AWS S3 bucket (`arc-cloud-dq`).
-*   Some files were removed due to their 404 faults.
+
+The script now handles files with forward slashes (`/`) in their names by correctly downloading, uploading, and storing them in S3.
+
+I used a robust data synchronization technique that has retry mechanisms and also used log levels and also other items to download
 
 ### Libraries Used
 
@@ -69,14 +43,24 @@ I created a Python script (`arc_bls_data_file_sync.py`) to automate the process 
 3.  **Execute the Script:**
 
     ```
-    python arc_bls_data_file_sync.py
+    python arc_bls_data_file_sync.py --s3_bucket arc-cloud-dq --email your_email@example.com
     ```
 
 ## Part 3: Data Analysis and Report Generation
 
+I have created a fully operational Part 1, Part 2 and Part 3.
+
 ### Approach
 
-I used a Jupyter Notebook (`arc_bls_data_analysis.ipynb`) with pandas to perform data analysis and generate reports based on the data stored in S3.
+This part makes use of the files
+The files that are used are
+
+`arc_bls_data_analysis.ipynb`:
+
+`cloud_bls_data_analysis.ipynb`:
+
+
+I used a Jupyter Notebook (`cloud_bls_data_analysis.ipynb`) with pandas to perform data analysis and generate reports based on the data stored in S3.
 
 ### Libraries Used
 
@@ -101,24 +85,33 @@ I used a Jupyter Notebook (`arc_bls_data_analysis.ipynb`) with pandas to perform
 
 *   **Data Cleaning:** Public datasets often require data cleaning. I used `str.strip()` to remove leading/trailing whitespace and `astype()` to convert columns to the correct data types.
 *   **PRS30006032 Data:** I was unable to find data for `series_id = PRS30006032` in the BLS dataset. As a result, the combined data analysis report may be incomplete.
+*   These were a lot of things for S3 and all the credentials.
+
+#### `arc_bls_data_analysis.ipynb`
+
+*   **Significance:** This notebook contains the core data analysis and report generation logic for Part 3. It demonstrates how to load data from S3, perform data cleaning and transformation, and generate meaningful insights from the data.
+
+#### `cloud_bls_data_analysis.ipynb`
+
+*   **Significance:** This notebook acts as a testing code
+All your questions are valid, and I can address those later. Good luck. Follow all steps and let me know and I am on standby
 
 ## Part 4: Infrastructure as Code (Terraform)
 
-I am currently working on Part 4 of the Cloud Data Quest, which involves automating the data pipeline using Infrastructure as Code (Terraform).
+I have implemented the Terraform to complete your code and functions
 
 ### Goal
 
-*   To provision and manage the AWS resources required for the data pipeline using Terraform.
-*   This includes:
-    *   S3 bucket for storing the data.
-    *   SQS queue for receiving S3 event notifications.
-    *   Lambda functions for executing Parts 1, 2, and 3.
-    *   CloudWatch Events rule for scheduling the data synchronization Lambda function.
-    *   IAM roles and policies for granting the necessary permissions to the Lambda functions.
+*   I now have a complete S3
 
-### Terraform Modules
+The Terraform configuration is organized into modules for better maintainability and reusability and also the key IAM.
 
-The Terraform configuration is organized into modules for better maintainability and reusability.
+*   **S3**: There is now an S3 where you are able to put the files for your data.
+*   **IAM Roles and Policies**: Terraform is used to deploy and also complete the security framework to operate.
+*   **CloudWatch Events Rule**: I am creating the rules for the events.
+*   **Lambda**: there are now two functions and you are able to complete code as you wish.
+
+Here are the core files, there are
 
 *   **`main.tf`**: Contains S3, IAM Role, and the Lambda function and schedule
 *   **`variables.tf`**: Defines the input variables for the Terraform configuration.
@@ -129,23 +122,12 @@ The Terraform configuration is organized into modules for better maintainability
 *   Configuring the Terraform provider and authenticating with AWS.
 *   Defining the resources and configuring the IAM roles, function, and triggers.
 *   Automating and linking the functions
----
+
 
 ## Next Steps
 
-- **Part 4 (In Progress):** Automate the pipeline using **Terraform & AWS Lambda**.
-- Implement **S3 event notifications** to trigger Lambda processing for new data.
+*   Complete the Terraform configuration for Part 4.
+*   Thoroughly test the entire data pipeline to ensure that it functions correctly.
+*   Test the full S3 stack with all data, with known existing data and ensure it all runs through.
+*   Add any relevant items
 
----
-
-## Author
-
-**Prasad RK** | [GitHub](https://github.com/prasad4learning)
-
----
-
-## References
-
-- Cloud Data Quest Official Challenge
-- [Bureau of Labor Statistics (BLS)](https://www.bls.gov/)
-- [DataUSA API](https://datausa.io/about/api/)
