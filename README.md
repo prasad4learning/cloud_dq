@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains the implementation of the **Rearc Data Quest**, a multi-step data engineering challenge that demonstrates skills in **AWS, Terraform, Python, and Data Analytics**. The project consists of four parts:
+This repository contains the implementation of the **Cloud Data Quest**, a multi-step data engineering challenge that demonstrates skills in **AWS, Terraform, Python, and Data Analytics**. The project consists of four parts:
 
 1. **AWS S3 & Sourcing Datasets** - Fetching data from the **Bureau of Labor Statistics (BLS)** and storing it in S3.
 2. **APIs & Data Ingestion** - Extracting data from **DataUSA API** and storing it in S3.
@@ -76,7 +76,7 @@ I created a Python script (`arc_bls_data_file_sync.py`) to automate the process 
 
 ### Approach
 
-I used a Jupyter Notebook (`rearc_data_quest_part3.ipynb`) with pandas to perform data analysis and generate reports based on the data stored in S3.
+I used a Jupyter Notebook (`arc_bls_data_analysis.ipynb`) with pandas to perform data analysis and generate reports based on the data stored in S3.
 
 ### Libraries Used
 
@@ -104,7 +104,7 @@ I used a Jupyter Notebook (`rearc_data_quest_part3.ipynb`) with pandas to perfor
 
 ## Part 4: Infrastructure as Code (Terraform)
 
-I am currently working on Part 4 of the Rearc Data Quest, which involves automating the data pipeline using Infrastructure as Code (Terraform).
+I am currently working on Part 4 of the Cloud Data Quest, which involves automating the data pipeline using Infrastructure as Code (Terraform).
 
 ### Goal
 
@@ -146,6 +146,6 @@ The Terraform configuration is organized into modules for better maintainability
 
 ## References
 
-- Rearc Data Quest Official Challenge
+- Cloud Data Quest Official Challenge
 - [Bureau of Labor Statistics (BLS)](https://www.bls.gov/)
 - [DataUSA API](https://datausa.io/about/api/)
