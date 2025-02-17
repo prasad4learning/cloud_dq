@@ -2,3 +2,13 @@ venv/
 __pycache__/
 *.log
 .DS_Store
+# Ignore Terraform state files
+.terraform/
+*.tfstate
+*.tfstate.backup
+terraform.tfstate.d/
+
+# Ignore sensitive files
+*.pem
+*.key
+
